@@ -1,0 +1,9 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+const { str, num } = Astro.params;
+---
+<Layout title="Dynamic route">
+    <main>
+        <h1>Page for {str} - {num}</h1>
+    </main>
+</Layout>

@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { GET } from './hello'
+
+let response = await GET(Astro)
+const data = await response.json()
+---
+
+<Layout title='Sentry'>
+    <main>
+        <p>Sentry Endpoint Test</p>
+        <p>msg: {data.msg}</p>
+        <p>res: {data.res}</p>
+        
+        <a href="/sentry-endpoints/abc-123">Go to abc-123</a>
+        <br>
+        <a href="/sentry-endpoints/def-456">Go to def-456</a>
+    </main>
+</Layout>
