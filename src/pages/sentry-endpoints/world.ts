@@ -1,29 +1,23 @@
 import type { APIRoute } from "astro";
 import * as Sentry from "@sentry/astro";
 
-export const GET: APIRoute = async ({ request, clientAddress }): Promise<Response> => {
-  const transaction = Sentry.getCurrentHub().startTransaction({
-    name: "GET /sentry-endpoints/hello",
-    op: "http.server",
-    metadata: {
-      request: {
-        headers: Object.fromEntries(request.headers.entries()),
-        method: "POST",
-        url: request.url
-      },
-      source: "route",
-    }
-  });
-  Sentry.getCurrentHub().configureScope((scope) => {
-    scope.setSpan(transaction);
-    scope.setUser({ ip_address: clientAddress });
-  });
-
-  try {
-    // adding an external fetch request to the mix
+export const GET: APIRoute = async ({ request }): Promise<Response> => {
+    return Sentry.trace({
+        name: "GET /sentry-endpoints/hello",
+        op: "http.server",
+        metadata: {
+          request: {
+            headers: Object.fromEntries(request.headers.entries()),
+            method: "POST",
+            url: request.url
+          },
+          source: "route",
+        }
+    }, async () => {
+            // adding an external fetch request to the mix
     const res = await (await fetch("https://httpbin.org/get")).json();
   
-    const response = new Response(
+    return new Response(
       JSON.stringify({ msg: "hi mom", res: JSON.stringify(res, null, 2) }),
       {
         status: 200,
@@ -32,11 +26,7 @@ export const GET: APIRoute = async ({ request, clientAddress }): Promise<Respons
         },
       }
     );
-  
-    return response;
-  } finally {
-    transaction?.finish();
-  }
+  })
 };
 
 // Ignore, this is not relevant for the reproduction,
